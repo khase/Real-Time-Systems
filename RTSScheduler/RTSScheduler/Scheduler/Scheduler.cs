@@ -154,7 +154,7 @@ namespace RTSScheduler.Scheduler
                 {
                     ResponseTimeOld = p.ResponseTime;
                     p.ResponseTime = ResponseNext(p.Task, ResponseTimeOld);
-                } while (p.ResponseTime != ResponseTimeOld);
+                } while (p.ResponseTime != ResponseTimeOld && p.ResponseTime < p.Task.Deadline);
             }
         }
 
