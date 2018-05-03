@@ -145,6 +145,29 @@ namespace RTSScheduler.Scheduler
             }
         }
 
+        protected virtual void analyseResponseTime()
+        {
+            foreach (Process p in processes)
+            {
+                double ResponseTimeOld = 0;
+                do
+                {
+                    ResponseTimeOld = p.ResponseTime;
+                    p.ResponseTime = ResponseNext(p.Task, ResponseTimeOld);
+                } while (p.ResponseTime != ResponseTimeOld);
+            }
+        }
+
+        private double ResponseNext(Task task, double responseAct)
+        {
+            return task.ExecutionTime + 
+                processes
+                .Select(p => p.Task)
+                .Where(t => t.Priority > task.Priority)
+                .Select(t => Math.Ceiling(responseAct / t.PeriodTime) * t.ExecutionTime)
+                .Sum();
+        }
+
         private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

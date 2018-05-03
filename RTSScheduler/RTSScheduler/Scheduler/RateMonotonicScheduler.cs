@@ -19,6 +19,8 @@ namespace RTSScheduler.Scheduler
                 tmp.OrderByDescending(t => t.Priority)
                 .Select<Task, Process>(t => new Process(t))
             );
+
+            analyseResponseTime();
         }
     }
 }

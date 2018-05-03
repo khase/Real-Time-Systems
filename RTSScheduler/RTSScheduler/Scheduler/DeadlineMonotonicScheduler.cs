@@ -19,6 +19,21 @@ namespace RTSScheduler.Scheduler
                 tmp.OrderByDescending(t => t.Priority)
                 .Select<Task, Process>(t => new Process(t))
             );
+
+            analyseResponseTime();
+        }
+
+        protected override void analyseResponseTime()
+        {
+            foreach (Process proc in Processes)
+            {
+                proc.ResponseTime = proc.Task.ExecutionTime +
+                    Processes
+                    .Select(p => p.Task)
+                    .Where(t => t.Priority > proc.Task.Priority)
+                    .Select(t => Math.Ceiling((double)proc.Task.Deadline / t.PeriodTime) * t.ExecutionTime)
+                    .Sum();
+            }
         }
     }
 }

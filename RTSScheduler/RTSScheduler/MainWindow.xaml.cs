@@ -61,7 +61,7 @@ namespace RTSScheduler
                 );
             }
 
-            Scheduler = new RateMonotonicScheduler(Tasks);
+            Scheduler = new DeadlineMonotonicScheduler(Tasks);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

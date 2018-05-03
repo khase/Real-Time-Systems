@@ -25,6 +25,8 @@ namespace RTSScheduler
         private int deadlineReachedIn;
         private int periodResetIn;
         private int cyclesNeeded;
+        private double responseTime;
+
 
         private ObservableCollection<Status> statusHistogram;
 
@@ -35,6 +37,18 @@ namespace RTSScheduler
         public ObservableCollection<Status> StatusHistogram
         {
             get { return statusHistogram; }
+        }
+        public double ResponseTime
+        {
+            get { return responseTime; }
+            set
+            {
+                if (value != responseTime)
+                {
+                    responseTime = value;
+                    OnPropertyChanged("ResponseTime");
+                }
+            }
         }
         public int CyclesNeeded
         {
