@@ -1,0 +1,95 @@
+﻿<Window x:Class="RTSScheduler.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RTSScheduler"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="800" Closing="Window_Closing" Loaded="Window_Loaded">
+    <Grid>
+        <Button Content="Complete" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="80" Click="ButtonComplete_Click" Height="52"/>
+        <Button Content="Do Tick" HorizontalAlignment="Left" Margin="95,10,0,0" VerticalAlignment="Top" Width="80" Click="ButtonTick_Click" Height="52"/>
+        <Label Content="Utilisation Factor:" HorizontalAlignment="Left" Margin="180,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding Scheduler.UtilizationFactor}" HorizontalAlignment="Left" Margin="281,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="Liu Test:" HorizontalAlignment="Left" Margin="180,36,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding Scheduler.LiuTest}" HorizontalAlignment="Left" Margin="281,36,0,0" VerticalAlignment="Top"/>
+        <Label Content="Current Cycle:" Margin="0,10,45.667,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="83"/>
+        <Label Content="{Binding Scheduler.CurrentCycle}" Margin="0,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="36"/>
+        <Label Content="Major Cycle:" Margin="0,36,45.667,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="83"/>
+        <Label Content="{Binding Scheduler.MajorCycle}" Margin="0,36,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="36"/>
+        <DataGrid ItemsSource="{Binding Scheduler.Processes}" Margin="10,67,9.667,9.667" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Name" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding Task.Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Period Time" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding Task.PeriodTime}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Deadline" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding Task.Deadline}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="ExecutionTime" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding Task.ExecutionTime}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Priority" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding Task.Priority}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Status" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding CurrentStatus}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Cycles Needed" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding CyclesNeeded}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Deadline In" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding DeadlineReachedIn}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Period Reset In" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding PeriodResetIn}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Schedule" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding HistogramString}" FontFamily="Courier New"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
