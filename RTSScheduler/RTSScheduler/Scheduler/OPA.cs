@@ -24,34 +24,52 @@ namespace RTSScheduler.Scheduler
         {
             List<Process> processList = new List<Process>();
 
-            for (var i = 0; i < Processes.Count; i++)
-                for (var j = i; j < Processes.Count; j++)
+            for (var i = 1; i <= Processes.Count; i++) { 
+                for (var j = i; j <= Processes.Count; j++)
                 {
-                    if(processList.Contains(Processes[j]))
-                        continue;
+                    /*if(processList.Contains(Processes[j]))
+                        continue;*/
                     swap(i,j);
-                    bool result = rta(base.Processes, i);
+                    bool result = Rta(Processes, i);
                     if (result)
                     {
-                        processList.Add(Processes[j]);
-                        continue;
+                        solutionFound = true;
+                        //processList.Add(Processes[j]);
+                        break;
+                    }
+                    else
+                    {
+                        swap(i, j);
                     }
                 }
 
-            if (processList.Count == Processes.Count)
-            {
-                solutionFound = true;
-                return true;
+                if (solutionFound == false)
+                {
+                    return false;
+                }
             }
-            else
-                return false;
+
+            return true;
+
         }
 
         private void swap(int i, int j)
         {
-            var tmp = Processes[i].Task.Priority;
-            Processes[i].Task.Priority = Processes[j].Task.Priority;
-            Processes[j].Task.Priority = tmp;
+            int gotIAt = 0;
+            int gotJAt = 0;
+            int n = 0;
+            foreach (var p in Processes)
+            {
+                if (p.Task.Priority == i)
+                    gotIAt = n;
+                if (p.Task.Priority == j)
+                    gotJAt = n;
+                n++;
+            }
+
+            Processes[gotIAt].Task.Priority = j;
+            Processes[gotJAt].Task.Priority = i;
+
         }
 
         public override String ToString()

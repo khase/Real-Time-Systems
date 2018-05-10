@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RTSScheduler.Scheduler
 {
-    public abstract class Scheduler: INotifyPropertyChanged
+    public abstract class Scheduler : INotifyPropertyChanged
     {
         private ObservableCollection<Process> processes;
 
@@ -26,6 +26,7 @@ namespace RTSScheduler.Scheduler
                 }
             }
         }
+
         public ObservableCollection<Process> Processes
         {
             get { return processes; }
@@ -44,28 +45,24 @@ namespace RTSScheduler.Scheduler
                 }
             }
         }
+
         public double UtilizationFactor
         {
             get
             {
-                return processes.Select<Process, double>(p => (double)p.Task.ExecutionTime / (double)p.Task.PeriodTime).Sum();
+                return processes
+                    .Select<Process, double>(p => (double) p.Task.ExecutionTime / (double) p.Task.PeriodTime).Sum();
             }
         }
 
         public bool LiuTest
         {
-            get
-            {
-                return UtilizationFactor <= (processes.Count * (Math.Pow(2, 1.0/processes.Count) - 1));
-            }
+            get { return UtilizationFactor <= (processes.Count * (Math.Pow(2, 1.0 / processes.Count) - 1)); }
         }
 
         public long MajorCycle
         {
-            get
-            {
-                return lcm(processes.Select<Process, int>(p => p.Task.PeriodTime).ToArray());
-            }
+            get { return lcm(processes.Select<Process, int>(p => p.Task.PeriodTime).ToArray()); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -76,6 +73,7 @@ namespace RTSScheduler.Scheduler
         }
 
         public abstract void doTick();
+
         public void schedule()
         {
             do
@@ -106,10 +104,12 @@ namespace RTSScheduler.Scheduler
                     {
                         numbers[i] = numbers[i] * (-1);
                     }
+
                     if (numbers[i] == 1)
                     {
                         cnt++;
                     }
+
                     /**
                      * divide numbers by devisor if complete division i.e. without
                      * remainder then replace number with quotient; used for find
@@ -121,6 +121,7 @@ namespace RTSScheduler.Scheduler
                         numbers[i] = numbers[i] / divisor;
                     }
                 }
+
                 /**
                  * If divisor able to completely divide any number from array
                  * multiply with lcm and store into lcm and continue to same divisor
@@ -134,6 +135,7 @@ namespace RTSScheduler.Scheduler
                 {
                     divisor++;
                 }
+
                 /**
                  * Check if all numbers is 1 indicate we found all factors and
                  * terminate while loop.
@@ -157,8 +159,8 @@ namespace RTSScheduler.Scheduler
                 } while (p.ResponseTime != ResponseTimeOld);
             }
         }
-        
-        protected virtual bool rta(ObservableCollection<Process> processes, int priority)
+
+        protected virtual bool Rta(ObservableCollection<Process> processes, int priority)
         {
             foreach (Process p in processes)
             {
@@ -170,11 +172,13 @@ namespace RTSScheduler.Scheduler
                     p.ResponseTime = ResponseNext(p.Task, ResponseTimeOld);
                 } while (p.ResponseTime != ResponseTimeOld);
 
-                if (p.Task.Deadline < ResponseTimeOld)
-                    return false;
-            }
-            return true;
+                if (p.Task.Deadline >= ResponseTimeOld)
+                    return true;
+                }
+
+            return false;
         }
+    
 
         private double ResponseNext(Task task, double responseAct)
         {
