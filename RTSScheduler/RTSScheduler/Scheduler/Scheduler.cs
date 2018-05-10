@@ -157,6 +157,24 @@ namespace RTSScheduler.Scheduler
                 } while (p.ResponseTime != ResponseTimeOld);
             }
         }
+        
+        protected virtual bool rta(ObservableCollection<Process> processes, int priority)
+        {
+            foreach (Process p in processes)
+            {
+                if (p.Task.Priority != priority) continue;
+                double ResponseTimeOld = 0;
+                do
+                {
+                    ResponseTimeOld = p.ResponseTime;
+                    p.ResponseTime = ResponseNext(p.Task, ResponseTimeOld);
+                } while (p.ResponseTime != ResponseTimeOld);
+
+                if (p.Task.Deadline < ResponseTimeOld)
+                    return false;
+            }
+            return true;
+        }
 
         private double ResponseNext(Task task, double responseAct)
         {
