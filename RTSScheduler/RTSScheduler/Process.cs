@@ -117,6 +117,16 @@ namespace RTSScheduler
             CyclesNeeded = Task.ExecutionTime;
         }
 
+        public void Reset()
+        {
+            StatusHistogram.Clear();
+            CurrentStatus = Status.Waiting;
+
+            PeriodResetIn = Task.PeriodTime;
+            DeadlineReachedIn = Task.Deadline;
+            CyclesNeeded = Task.ExecutionTime;
+        }
+
         public void doTick(bool start, bool preempt = false)
         {
             DeadlineReachedIn--;

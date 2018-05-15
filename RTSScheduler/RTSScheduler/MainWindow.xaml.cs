@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.IO;
 using System.Windows;
 using RTSScheduler.Scheduler;
@@ -96,7 +97,12 @@ namespace RTSScheduler
             catch (ProcessNotFinishedException pe)
             {
                 OPA rta = new OPA(Scheduler.Processes);
-                MessageBox.Show(pe.ToString() + "\n\n" + rta.ToString(), pe.CausingProcess.Task.Name);
+                MessageBoxResult res = MessageBox.Show(pe.ToString() + "\n\n" + rta.ToString() + "\n\nOverwrite Priorities?", pe.CausingProcess.Task.Name, MessageBoxButton.YesNo);
+                if (res == MessageBoxResult.Yes)
+                {
+                    Scheduler = rta;
+                    Scheduler.Processes.ToList().ForEach(p => p.Reset());
+                }
                 //MessageBox.Show(pe.ToString() , pe.CausingProcess.Task.Name);
             }
         }
@@ -110,7 +116,12 @@ namespace RTSScheduler
             catch (ProcessNotFinishedException pe)
             {
                 OPA rta = new OPA(Scheduler.Processes);
-                MessageBox.Show(pe.ToString() + "\n\n" + rta.ToString(), pe.CausingProcess.Task.Name);
+                MessageBoxResult res = MessageBox.Show(pe.ToString() + "\n\n" + rta.ToString() + "\n\nOverwrite Priorities?", pe.CausingProcess.Task.Name, MessageBoxButton.YesNo);
+                if (res == MessageBoxResult.Yes)
+                {
+                    Scheduler = rta;
+                    Scheduler.Processes.ToList().ForEach(p => p.Reset());
+                }
                 //MessageBox.Show(pe.ToString(), pe.CausingProcess.Task.Name);
             }
         }
