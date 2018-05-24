@@ -1,20 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using RTSScheduler.Scheduler;
 
 namespace RTSScheduler
@@ -107,7 +96,14 @@ namespace RTSScheduler
             }
             catch (ProcessNotFinishedException pe)
             {
-                MessageBox.Show(pe.ToString(), pe.CausingProcess.Task.Name);
+                OPA rta = new OPA(Scheduler.Processes);
+                MessageBoxResult res = MessageBox.Show(pe.ToString() + "\n\n" + rta.ToString() + "\n\nOverwrite Priorities?", pe.CausingProcess.Task.Name, MessageBoxButton.YesNo);
+                if (res == MessageBoxResult.Yes)
+                {
+                    Scheduler = rta;
+                    Scheduler.Processes.ToList().ForEach(p => p.Reset());
+                }
+                //MessageBox.Show(pe.ToString() , pe.CausingProcess.Task.Name);
             }
         }
 
@@ -119,7 +115,14 @@ namespace RTSScheduler
             }
             catch (ProcessNotFinishedException pe)
             {
-                MessageBox.Show(pe.ToString(), pe.CausingProcess.Task.Name);
+                OPA rta = new OPA(Scheduler.Processes);
+                MessageBoxResult res = MessageBox.Show(pe.ToString() + "\n\n" + rta.ToString() + "\n\nOverwrite Priorities?", pe.CausingProcess.Task.Name, MessageBoxButton.YesNo);
+                if (res == MessageBoxResult.Yes)
+                {
+                    Scheduler = rta;
+                    Scheduler.Processes.ToList().ForEach(p => p.Reset());
+                }
+                //MessageBox.Show(pe.ToString(), pe.CausingProcess.Task.Name);
             }
         }
 

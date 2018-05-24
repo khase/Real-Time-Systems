@@ -13,6 +13,7 @@ namespace RTSScheduler.Scheduler
         {
             int count = tasks.Count;
             var tmp = tasks.OrderByDescending(t => t.Deadline).ToList();
+            tmp.Reverse();
             tmp.ForEach(t => t.Priority = (tmp.IndexOf(t) + 1));
 
             Processes = new ObservableCollection<Process>(

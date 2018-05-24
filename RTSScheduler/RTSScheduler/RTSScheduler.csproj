@@ -61,6 +61,7 @@
     <Compile Include="ProcessNotFinishedException.cs" />
     <Compile Include="Scheduler\MonotonicScheduler.cs" />
     <Compile Include="Scheduler\DeadlineMonotonicScheduler.cs" />
+    <Compile Include="Scheduler\OPA.cs" />
     <Compile Include="Scheduler\RateMonotonicScheduler.cs" />
     <Compile Include="Scheduler\Scheduler.cs" />
     <Compile Include="Task.cs" />
