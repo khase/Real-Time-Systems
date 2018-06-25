@@ -1,0 +1,8 @@
+Last Modified Date & Time: 06/24/2018 21:39:38
+
+BasicCAN_0: BasicCAN_0.cydwr
+	cy_boot [v5.30] to [v5.70]
+	Em_EEPROM_Dynamic [v2.0] to [v2.10]
+	LIN_Dynamic [v3.30] to [v4.0]
+
+
