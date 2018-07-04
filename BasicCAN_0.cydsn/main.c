@@ -154,11 +154,16 @@ enum Color start(){
         }
         CyDelay(i);
     }
-    //sprintf( buffer, "Color: %i\n", color);
-    //UART_PutString( buffer );
     return color;
 }
 
+enum Color led_blink(){
+    
+    enum Color color;
+    color = start();
+    
+    return color;
+}
 
 void init(){
  CyGlobalIntEnable; /* Enable global interrupts. */
@@ -173,17 +178,6 @@ void init(){
     sprintf(buffer, "\n\rWelcome!\n\r");
     UART_PutString( buffer );
 }
-
-enum Color led_blink(){
-    
-    enum Color color;
-    //Pin_USR_LED_Write(1u);
-    color = start();
-    //Pin_USR_LED_Write(0u);
-    
-    return color;
-}
-
 
 int main()
 {
@@ -235,21 +229,14 @@ int main()
 
     CAN_TX_MSG canMsg_2;
     CAN_DATA_BYTES_MSG canDataBuf_2; 
-//    uint8 data_2[8] = { 'D', 'E', 'A', 'D', 'B', 'E', 'E', 'F' };
     uint8 data_red[8] = { 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
     uint8 data_green[8] = { 0x00, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
     uint8 data_blue[8] = { 0x00, 0x0, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0 };
-      //memcpy( &canDataBuf_2, data_2, 8 );
-//    canMsg_2.id  = 0x5678;  // standard msg id 11 bits (0x000 to 0x7EF)
-    canMsg_2.id  = 0x1;  // extended msg id 29 bits (0x00000000 to 0x1FBFFFFF)
-//    canMsg_2.rtr = 1;         //  request RTR
     canMsg_2.rtr = 0;       // no request RTR
-//    canMsg_2.ide = 0x00;    // standard msg
     canMsg_2.ide = 0x00;    // extended msg
     canMsg_2.dlc = 8;       // 4 bytes payload
     canMsg_2.irq = 0;       // not itr
-    canMsg_2.msg = &canDataBuf_2;   // reference data buffer 
-//    canMsg_2.msg = (CAN_DATA_BYTES_MSG*) data_2;   // reference data buffer 
+    canMsg_2.msg = &canDataBuf_2;   // reference data buffer  
     
     int isButtonPressed = 0;
     int seed = 0;
@@ -276,14 +263,7 @@ int main()
     
     // Main loop
     for(;;)     // forever
-    {
-        
-        //wait for an message => all player are ready and ne new round can start
-        //bla bla
-        // fu ba r
-        // newRound = 1;
-        
-               
+    {               
         if(Pin_USR_SW1_Read() == 0 || button_Read()){
             isButtonPressed = 1;     
             newRound = 1;
@@ -298,23 +278,21 @@ int main()
         
         if(newRound){
             newRound = 0;
-            //sprintf( buffer, "Color: %i\n", color);
-            //UART_PutString( buffer );
             switch(color){
                 case color_RED:
-                    //send message that the current color is red
+                    // send message that the current color is red
                     memcpy( &canDataBuf_2, data_red, 8 );
                     sprintf( buffer, "\n\rRED Color\n\r");
                     UART_PutString( buffer );
                     break;
                 case color_BLUE: 
-                    //send message that the current color is blue
+                    // send message that the current color is blue
                      memcpy( &canDataBuf_2, data_blue, 8 );
                     sprintf( buffer, "\n\rBLUE Color\n\r");
                     UART_PutString( buffer );
                     break;
                 case color_GREEN: 
-                    //send message that the current color is green
+                    // send message that the current color is green
                      memcpy( &canDataBuf_2, data_green, 8 );
                     sprintf( buffer, "\n\rGREEN Color\n\r");
                     UART_PutString( buffer );
@@ -348,95 +326,6 @@ int main()
             }
             cInput = 0;
         }
-        
-        
-        /*
-        //send message
-        // Place your application code here. 
-        // uart char received?
-        if ( cRx != 0 ) {           // char received
-            isr_UART_RX_Disable();  // disable Itr
-            cInput = cRx;           // copy char
-            cRx = 0;                // reset
-            isr_UART_RX_Enable();   // enable Itr
-        }
-        
-        if ( cInput != 0 ) {        // has input
-            switch ( cInput ) {     // handle input
-                case 'h':
-                case 'H':
-                    prtHelp( UART_PutString );
-                    break;
-                    
-                case 'L':
-                    USERLED_ONOFF( 1u );   // on
-                    break;
-                case 'l':
-                    USERLED_ONOFF( 0u );   // off
-                    break;
-                    
-                case 'c':           // send CAN msg
-                    canMsg_1.ide = 0x0;
-                    CAN_SendMsg( &canMsg_1 );
-                    canMsg_2.ide = 0x0;
-                    CAN_SendMsg( &canMsg_2 );
-                    break;
-                    
-                case 'C':           // send extended CAN msg
-                    canMsg_1.ide = 0xFF;
-                    CAN_SendMsg( &canMsg_1 );
-                    canMsg_2.ide = 0xFF;
-                    CAN_SendMsg( &canMsg_2 );
-                    break;
-                    
-                case 'S':
-                    flagProcessCAN_RX = !flagProcessCAN_RX;
-                    sprintf( buffer, "process CAN %s\n\r",
-                        (flagProcessCAN_RX) ? "on" : "off");
-                    UART_PutString( buffer );
-                case 's':
-                    sprintf( buffer, 
-                        "CAN buffers received since start: %ld\n\r",
-                        canRXcnt );
-                    UART_PutString( buffer );
-                    break;
-                    
-                default:    // repeat char
-                    UART_PutChar( cInput );
-                    break;
-            } // end switch
-            cInput = 0;             // reset, don't forget!
-        }
-        
-        
-        // CAN message
-        if ( flagCAN_RX ) {
-            if (flagProcessCAN_RX) {
-                sprintf( buffer, ">> %6ld, mbx: %d, id: %08lXh, ide: %d, rtr: %d, len: %d\n\r",
-                    canRXcnt,
-                    canRXmsg.rxMailbox, canRXmsg.id, 
-                    canRXmsg.ide, canRXmsg.rtr,
-                    canRXmsg.msgLen );
-                UART_PutString( buffer );
-                uint8 i;
-                for ( i = 0; i < canRXmsg.msgLen; i++ ) {
-                    sprintf( buffer, " %02X", canRXmsg.msgData[i] );
-                    UART_PutString( buffer );
-                }
-                UART_PutString( "\n\r" );
-            }
-            flagCAN_RX = 0;         // reset, don't forget!
-        }
-        
-        // for Test Only!
-        if ( !Pin_USR_SW1_Read() ) { // Button pressed
-            USERLED_ONOFF( 1u );   // User LED on
-            CyDelay( 50 );
-            USERLED_ONOFF( 0u );   // User LED off
-//            UART_PutChar( 0x07 );        // bell on Terminal
-        }*/
-        
-            
     } // end for ever
 } // end main
 
