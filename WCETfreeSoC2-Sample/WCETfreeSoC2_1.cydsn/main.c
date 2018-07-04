@@ -18,6 +18,9 @@
 #include "swsign.h"
 #include "help.h"
 #include "etCount.h"    // execution time counter
+#include <inttypes.h>
+#include <time.h>
+#include <stdlib.h>
 
 int gj;                 // a global var
 
@@ -28,6 +31,7 @@ int gj;                 // a global var
 inline void usrLED( uint8 sts ) {
     Pin_USR_LED_Write( sts );
 }
+   
 
 int tsta(int a){
     int ret = a;
@@ -99,6 +103,44 @@ unsigned long* statistics(void* func(int), int count){
     
     return res;
 }
+
+uint64_t fibbonacci(uint64_t n) {
+   if(n == 0){
+      return 0;
+   } else if(n == 1) {
+      return 1;
+   } else {
+      return (fibbonacci(n-1) + fibbonacci(n-2));
+   }
+}
+
+// computes all prims up to range
+int getHightestPrim(int range){
+    int x, i,n;
+    for (x = 2; x <= range; x++)
+    {
+        int rnd  = rand()/1000000; 
+        int sum = 0;
+        if ( rnd %2 == 0){
+            for(int j = 0; j < rnd;j++){
+                sum += j;
+                sum /= 100;
+            }
+        }
+        for (i = 2; i <= x; i++)
+        {
+            if (x%i == 0 && x != i) 
+                break;
+            if (i == x){
+                n = x;
+                sum++;
+            }
+        }
+    }
+    return n;
+}
+
+
 
 /**
  * \def USERLED_ONOFF
@@ -247,7 +289,7 @@ int main()
                 case 'a':
                     CNT_START_RES;  // reset counter
                     for ( i = 0; i < 999999; i++ ) {
-                        if (i % 2 == 0 || i != 100){
+                        if ((i == 100 && i < 100) || i % 2 == 0 ){
                             a++;
                         }
                         else{
@@ -350,9 +392,68 @@ int main()
                         UART_PutString( buffer );
                     }
                     break;
-                default:    // repeat char
-                    UART_PutChar( cInput );
+               case 'q':
+                    CNT_START_RES;  // reset counter
+                    
+                    uint64_t fn_1 = 0;
+                    uint64_t fn_2 = 1;
+                    uint64_t fnew;
+                                      
+                    for ( i = 0; i < 45; i++ ) {
+                        fnew = fn_1 + fn_2;
+                        fn_2 = fn_1;
+                        fn_1 = fnew;
+                    }
+                    CNT_LAP_STOP( cnt );   // get counter value, stop counter
+                    sprintf( buffer, "Höchste gefundene Fibonaccizahl: %lu\n\r" , fnew);
+                    UART_PutString(buffer);
+                    sprintf( buffer, "Time for fibonacci in loop with 45 steps: %lu\n\r", cnt );
+                    UART_PutString( buffer );
+                    
+                    // Rekursiver Aufruf
+                    CNT_START_RES;  // reset counter
+                    uint64_t fn;
+                    fn = fibbonacci(20)
+                    CNT_LAP_STOP( cnt );   // get counter value, stop counter
+                    sprintf( buffer, "Höchste gefundene Fibonaccizahl : %lu\n\r", fn);
+                    UART_PutString(buffer);
+                    sprintf( buffer, "Time for fibonacci(rekursiv), depth = 20: %lu\n\r", cnt );
+                    UART_PutString( buffer );
                     break;
+                case 'y':
+                    CNT_START_RES;  // reset counter
+                    CNT_LAP_STOP( cnt )
+                    long bestTime = -100;
+                    sprintf( buffer, "STARTE !!!!\n\r");   
+                    srand((unsigned) time(0));
+                    UART_PutString( buffer );
+                    long worstTime = 0;
+                    int amount = 1000;
+                    for(int i = 0; i < amount; i++)
+                    {
+                        CNT_START_RES;  // reset counter
+                        int x;
+                        x = getHightestPrim(100);
+                        CNT_LAP_STOP( cnt );   // get counter value, stop counter
+                        if(cnt > worstTime){
+                            worstTime = cnt;
+                        }
+                        if(cnt < bestTime || bestTime <= 0){
+                            bestTime = cnt;
+                        }
+                    }
+                    sprintf( buffer, "Run getHightestPrim() for %i times. :\n\r ", amount);
+                    UART_PutString( buffer );
+                    sprintf( buffer, "Result:\nBest Execution Time for Prim: %lu\n\r", bestTime );
+                    UART_PutString( buffer );
+                    sprintf( buffer, "Worst Execution Time for Prim: %lu\n\r", worstTime );
+                    UART_PutString( buffer );
+                    
+                    
+                    break; 
+                    default:    // repeat char
+                        UART_PutChar( cInput );
+                        break;
             } // end switch
             cInput = 0;             // reset, don't forget!
         }

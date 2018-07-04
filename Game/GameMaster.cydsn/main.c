@@ -57,27 +57,32 @@ void start(){
 
 int main(void)
 {
-    CyGlobalIntEnable; /* Enable global interrupts. */
+    while(1){
+        if(Pin_USR_SW1_Read == 0){
+            continue;
+        }
+            CyGlobalIntEnable; /* Enable global interrupts. */
 
-    /* Place your initialization/startup code here (e.g. MyInst_Start()) */
-    UART_1_Start();  
-    
-    Red_Start();
-    Green_Start();
-    Blue_Start();
-    
-    PRS_1_Start();
-    
-    srand(PRS_1_Read());
-    
-    sprintf( buffer, "\n\rWelcome!\n\r");
-    UART_1_PutString( buffer );
-    
-    Pin_USR_LED_Write(1u);
-    start();
-    Pin_USR_LED_Write(0u);
-    for(;;)
-    {
+            /* Place your initialization/startup code here (e.g. MyInst_Start()) */
+            UART_1_Start();  
+            
+            Red_Start();
+            Green_Start();
+            Blue_Start();
+            
+            PRS_1_Start();
+            
+            srand(PRS_1_Read());
+            
+            sprintf( buffer, "\n\rWelcome!\n\r");
+            UART_1_PutString( buffer );
+            
+            Pin_USR_LED_Write(1u);
+            start();
+            Pin_USR_LED_Write(0u);
+            /*for(;;)
+            {
+            }*/
     }
 }
 

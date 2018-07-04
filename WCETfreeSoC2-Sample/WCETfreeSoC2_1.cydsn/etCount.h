@@ -99,7 +99,7 @@
  * @author Ralf S. Mayer
  * @date 2018-04-27
  */
-#define CNT_LAP_STOP(var)   Control_Reg_Write( CNT_DISABLE_NORESET ); \
+#define CNT_LAP_STOP(var)   ;Control_Reg_Write( CNT_DISABLE_NORESET ); \
                             GET_COUNTER(var, (int32)StatusReg_0_Read(), (int32)StatusReg_1_Read(), (int32)StatusReg_2_Read(), (int32)StatusReg_3_Read() );
  
 

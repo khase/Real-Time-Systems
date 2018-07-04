@@ -82,15 +82,6 @@ void CAN_ReceiveMsg_Callback() {
     memcpy( &canRXmsg, &canRXmsgRaw, sizeof(canRXmsg_t) );
     canRXcnt++;
     flagCAN_RX = 1;
-    
-    CAN_TX_MSG canMsg_1;
-    canMsg_1.id  = 0x01110;
-    canMsg_1.rtr = canRXmsg.rtr; 
-    canMsg_1.ide = canRXmsg.ide;
-    canMsg_1.dlc = canRXmsg.msgLen;
-    canMsg_1.irq = 0;
-    canMsg_1.msg = (CAN_DATA_BYTES_MSG*)canRXmsg.msgData;
-    CAN_SendMsg( &canMsg_1 );
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -132,9 +123,9 @@ enum Color start(){
     
     enum Color color = color_BLUE;
     int r = 0;
-    for(int i = 50; i < 200; i += 5)
+    for(int i = 50; i < 200; i += 0)
     {
-        r = rand() % 5;
+        r = rand() % 10;
         
         set(50, 0, 0);
         i += r;
@@ -179,16 +170,16 @@ void init(){
     
     PRS_1_Start();
     
-    sprintf( buffer, "\n\rWelcome!\n\r");
+    sprintf(buffer, "\n\rWelcome!\n\r");
     UART_PutString( buffer );
 }
 
 enum Color led_blink(){
     
     enum Color color;
-    Pin_USR_LED_Write(1u);
+    //Pin_USR_LED_Write(1u);
     color = start();
-    Pin_USR_LED_Write(0u);
+    //Pin_USR_LED_Write(0u);
     
     return color;
 }
@@ -221,7 +212,7 @@ int main()
         getCANsamplingMode() );
     UART_PutString( buffer );
     
-    cRx = 'S';  // dirty!!! jump to menue directly
+    cRx = 'F';  // dirty!!! jump to menue directly
     
     char cInput = 0;
     
@@ -245,18 +236,20 @@ int main()
     CAN_TX_MSG canMsg_2;
     CAN_DATA_BYTES_MSG canDataBuf_2; 
 //    uint8 data_2[8] = { 'D', 'E', 'A', 'D', 'B', 'E', 'E', 'F' };
-    uint8 data_2[8] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
-    memcpy( &canDataBuf_2, data_2, 8 );
+    uint8 data_red[8] = { 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+    uint8 data_green[8] = { 0x00, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+    uint8 data_blue[8] = { 0x00, 0x0, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0 };
+      //memcpy( &canDataBuf_2, data_2, 8 );
 //    canMsg_2.id  = 0x5678;  // standard msg id 11 bits (0x000 to 0x7EF)
     canMsg_2.id  = 0x1;  // extended msg id 29 bits (0x00000000 to 0x1FBFFFFF)
 //    canMsg_2.rtr = 1;         //  request RTR
     canMsg_2.rtr = 0;       // no request RTR
 //    canMsg_2.ide = 0x00;    // standard msg
-    canMsg_2.ide = 0xFF;    // extended msg
+    canMsg_2.ide = 0x00;    // extended msg
     canMsg_2.dlc = 8;       // 4 bytes payload
     canMsg_2.irq = 0;       // not itr
-//    canMsg_2.msg = &canDataBuf_1;   // reference data buffer 
-    canMsg_2.msg = (CAN_DATA_BYTES_MSG*) data_2;   // reference data buffer 
+    canMsg_2.msg = &canDataBuf_2;   // reference data buffer 
+//    canMsg_2.msg = (CAN_DATA_BYTES_MSG*) data_2;   // reference data buffer 
     
     int isButtonPressed = 0;
     int seed = 0;
@@ -265,7 +258,7 @@ int main()
     /* INITIALIZE RANDOM SEED */
     for(;;){
         seed++;
-        if (Pin_USR_SW1_Read() == 0)
+        if (Pin_USR_SW1_Read() == 0 || button_Read())
         {
              break;
         }
@@ -290,8 +283,8 @@ int main()
         // fu ba r
         // newRound = 1;
         
-        // wait for the buttonpress
-        if(Pin_USR_SW1_Read() == 0){
+               
+        if(Pin_USR_SW1_Read() == 0 || button_Read()){
             isButtonPressed = 1;     
             newRound = 1;
             sprintf( buffer, "\n\rButton pressed\n\r");
@@ -310,16 +303,19 @@ int main()
             switch(color){
                 case color_RED:
                     //send message that the current color is red
+                    memcpy( &canDataBuf_2, data_red, 8 );
                     sprintf( buffer, "\n\rRED Color\n\r");
                     UART_PutString( buffer );
                     break;
                 case color_BLUE: 
                     //send message that the current color is blue
+                     memcpy( &canDataBuf_2, data_blue, 8 );
                     sprintf( buffer, "\n\rBLUE Color\n\r");
                     UART_PutString( buffer );
                     break;
                 case color_GREEN: 
                     //send message that the current color is green
+                     memcpy( &canDataBuf_2, data_green, 8 );
                     sprintf( buffer, "\n\rGREEN Color\n\r");
                     UART_PutString( buffer );
                     break;
@@ -327,14 +323,36 @@ int main()
                     sprintf( buffer, "\n\rUps, something gone wrong!\n\r");
                     UART_PutString( buffer );
             }
+            canMsg_2.msg = &canDataBuf_2;
+            Pin_USR_LED_Write(1u);
+            CAN_SendMsg( &canMsg_2 );
+            Pin_USR_LED_Write(0u);
+        }
+        
+        if ( cRx != 0 ) {           // char received
+            isr_UART_RX_Disable();  // disable Itr
+            cInput = cRx;           // copy char
+            cRx = 0;                // reset
+            isr_UART_RX_Enable();   // enable Itr
+        }
+        
+        if ( cInput != 0 ) {        // has input
+            switch ( cInput ) {     // handle input
+                case 'S':
+                case 's':
+                    // wait for the buttonpress
+                    isButtonPressed = 1;     
+                    newRound = 1;
+                    sprintf( buffer, "\n\rInvoke Button pressed\n\r");
+                    UART_PutString( buffer );
+            }
+            cInput = 0;
         }
         
         
-        
-        
-        
+        /*
         //send message
-        /* Place your application code here. 
+        // Place your application code here. 
         // uart char received?
         if ( cRx != 0 ) {           // char received
             isr_UART_RX_Disable();  // disable Itr
@@ -342,7 +360,7 @@ int main()
             cRx = 0;                // reset
             isr_UART_RX_Enable();   // enable Itr
         }
-
+        
         if ( cInput != 0 ) {        // has input
             switch ( cInput ) {     // handle input
                 case 'h':
@@ -389,6 +407,7 @@ int main()
             } // end switch
             cInput = 0;             // reset, don't forget!
         }
+        
         
         // CAN message
         if ( flagCAN_RX ) {
